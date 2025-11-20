@@ -1,0 +1,105 @@
+:root {
+  color-scheme: light dark;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at top, #cce4ff 0%, #f4f6fb 45%, #e0e7ff 100%);
+  color: #0f172a;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+.app-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.8rem;
+}
+
+.app-header .eyebrow {
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 0;
+  color: rgba(15, 23, 42, 0.6);
+}
+
+.endpoint {
+  margin: 0;
+  color: rgba(15, 23, 42, 0.6);
+  font-size: 0.9rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.header-actions button {
+  border-radius: 999px;
+  border: none;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  background: #0f172a;
+  color: #fff;
+  transition: filter 200ms ease;
+}
+
+.header-actions button:last-of-type {
+  background: transparent;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  color: #0f172a;
+}
+
+.header-actions button:hover {
+  filter: brightness(1.1);
+}
+
+.app-warnings {
+  margin: 1rem 2rem 0;
+  border-radius: 0.75rem;
+  background: #fffbea;
+  border: 1px solid #f6c343;
+  color: #7c4a02;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+
+.app-warnings p {
+  margin: 0.2rem 0;
+}
+
+.app-main {
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  min-height: 0;
+}
+
+openai-chatkit, .chatkit-host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
+
+@media (max-width: 720px) {
+  .app-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

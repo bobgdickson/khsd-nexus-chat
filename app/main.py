@@ -5,6 +5,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
 
 from chatkit.server import NonStreamingResult, StreamingResult
@@ -12,16 +13,42 @@ from chatkit.store import NotFoundError
 
 from .config import settings
 from .server import NexusChatServer
-from .stores import InMemoryAttachmentStore, InMemoryStore
+from .stores import (
+    InMemoryAttachmentStore,
+    InMemoryStore,
+    PostgresAttachmentStore,
+    PostgresStore,
+)
 
 load_dotenv()
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title=settings.app_name)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_allow_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-data_store = InMemoryStore()
-attachment_store = InMemoryAttachmentStore(data_store)
-server = NexusChatServer(data_store, attachment_store)
+if settings.database_url:
+    data_store = PostgresStore(settings.database_url)
+    attachment_store = PostgresAttachmentStore(
+        data_store,
+        upload_base_url=settings.public_base_url,
+    )
+else:
+    data_store = InMemoryStore()
+    attachment_store = InMemoryAttachmentStore(
+        data_store, upload_base_url=settings.public_base_url
+    )
+server = NexusChatServer(
+    data_store,
+    attachment_store,
+    instructions=settings.assistant_instructions,
+    history_limit=settings.history_limit,
+)
 
 
 def build_request_context(request: Request) -> dict[str, Any]:
@@ -34,14 +61,10 @@ def build_request_context(request: Request) -> dict[str, Any]:
 
 @app.post("/chatkit")
 async def chatkit_endpoint(request: Request):
-    payload = await request.body()
-    context = build_request_context(request)
-    result = await server.process(payload, context=context)
+    result = await server.process(await request.body(), {})
     if isinstance(result, StreamingResult):
         return StreamingResponse(result, media_type="text/event-stream")
-    if isinstance(result, NonStreamingResult):
-        return Response(content=result.json, media_type="application/json")
-    raise HTTPException(status_code=500, detail="Unexpected ChatKit response type")
+    return Response(content=result.json, media_type="application/json")
 
 
 @app.post("/attachments/{attachment_id}/upload")
@@ -67,3 +90,8 @@ async def read_attachment(attachment_id: str):
 @app.get("/health")
 async def healthcheck():
     return {"status": "ok"}
+
+
+@app.get("/chatkit/config")
+async def chatkit_config():
+    return settings.get_public_config()

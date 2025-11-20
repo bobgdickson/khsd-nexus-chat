@@ -19,15 +19,16 @@ class NexusChatServer(ChatKitServer[dict[str, Any]]):
         self,
         store: InMemoryStore,
         attachment_store: InMemoryAttachmentStore,
+        *,
+        instructions: str,
+        history_limit: int,
     ) -> None:
         super().__init__(store, attachment_store)
+        self.history_limit = history_limit
         self.assistant_agent = Agent[AgentContext](
             model=settings.model,
             name="Assistant",
-            instructions=(
-                "You are a helpful assistant for the KHSD Nexus Chat experience. "
-                "Respond concisely and clearly."
-            ),
+            instructions=instructions,
         )
 
     async def respond(
@@ -41,9 +42,17 @@ class NexusChatServer(ChatKitServer[dict[str, Any]]):
             store=self.store,
             request_context=context,
         )
-        agent_input = (
-            await simple_to_agent_input(input_user_message) if input_user_message else []
+        items_page = await self.store.load_thread_items(
+            thread.id,
+            after=None,
+            limit=self.history_limit,
+            order="desc",
+            context=context,
         )
+        thread_items = list(reversed(items_page.data))
+        if input_user_message and (not thread_items or thread_items[-1].id != input_user_message.id):
+            thread_items.append(input_user_message)
+        agent_input = await simple_to_agent_input(thread_items) if thread_items else []
         result = Runner.run_streamed(
             self.assistant_agent,
             agent_input,
