@@ -26,6 +26,7 @@ Backend service for the Nexus ChatKit frontend. This FastAPI app exposes the sin
    - `CHATKIT_DOMAIN_KEY` – domain key from the OpenAI dashboard.
    - `CHATKIT_GREETING` / `CHATKIT_PLACEHOLDER` – customize the start screen and composer text.
    - `CHATKIT_START_SCREEN_PROMPTS_JSON` – JSON array of `{ "label": "...", "prompt": "..." }` shown on the start screen.
+   - `FIN_STR` – ODBC connection string for the PeopleSoft data warehouse used by the `get_department_supplier_actuals` tool.
 
 3. Start the server:
 
@@ -70,6 +71,7 @@ The `frontend` directory contains a Vite + React app with the ChatKit web compon
 
 - Without `DATABASE_URL`, storage falls back to in-memory (`InMemoryStore` and `InMemoryAttachmentStore`). Restarting the process clears all threads, items, and uploads. Set `DATABASE_URL` to keep everything in PostgreSQL.
 - The server uses the OpenAI Agents SDK via `openai-chatkit`. Update the default model or instructions in `app/config.py` if you want a different persona.
+- The ChatKit agent exposes a `get_department_supplier_actuals` tool that queries PeopleSoft using the SQL in `app/sql/dept_supplier_actuals.sql`. Set `FIN_STR` to a valid SQL Server ODBC connection string so the tool can run.
 - Set `DATABASE_URL` to enable the PostgreSQL store. Run `alembic upgrade head` after changing models.
 
 ## Database & migrations

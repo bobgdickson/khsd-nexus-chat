@@ -59,6 +59,9 @@ export default function App() {
     return (
       <div className="app-shell">
         <header className="app-header">
+          <div className="logo-wrap">
+            <img src="/media/header_logo.png" alt="KHSD logo" className="app-logo" />
+          </div>
           <div>
             <p className="eyebrow">KHSD Nexus Chat</p>
             <h1>Project SPARK Chatbot</h1>
@@ -75,6 +78,9 @@ export default function App() {
     return (
       <div className="app-shell">
         <header className="app-header">
+          <div className="logo-wrap">
+            <img src="/media/header_logo.png" alt="KHSD logo" className="app-logo" />
+          </div>
           <div>
             <p className="eyebrow">KHSD Nexus Chat</p>
             <h1>Project SPARK Chatbot</h1>
@@ -91,6 +97,9 @@ export default function App() {
     return (
       <div className="app-shell">
         <header className="app-header">
+          <div className="logo-wrap">
+            <img src="/media/header_logo.png" alt="KHSD logo" className="app-logo" />
+          </div>
           <div>
             <p className="eyebrow">KHSD Nexus Chat</p>
             <h1>Project SPARK Chatbot</h1>
@@ -175,7 +184,9 @@ function ChatKitSurface({ config }: { config: ChatKitUiConfig }) {
           <h1>Project SPARK Chatbot</h1>
           <p className="endpoint">Backend: {config.apiUrl}</p>
         </div>
-
+        <div className="logo-wrap">
+          <img src="/media/header_logo.png" alt="KHSD logo" className="app-logo" />
+        </div>
       </header>
       <main className="app-main">
         <ChatKit ref={chatkit.ref} control={chatkit.control} className="chatkit-host" />

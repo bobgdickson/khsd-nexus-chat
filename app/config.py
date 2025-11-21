@@ -55,6 +55,7 @@ class Settings(BaseSettings):
     start_screen_greeting: str = "Ask me anything about your schools."
     composer_placeholder: str = "How can we help?"
     start_screen_prompts_json: str | None = None
+    fin_connection_string: str | None = Field(default=None, alias="FIN_STR")
     cors_allow_origins: list[str] = Field(default_factory=lambda: ["*"])
 
     model_config = SettingsConfigDict(env_prefix="", env_file=".env", extra="ignore")

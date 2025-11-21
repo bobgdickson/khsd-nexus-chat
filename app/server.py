@@ -6,10 +6,11 @@ from typing import Any
 from agents import Agent, Runner
 from chatkit.agents import AgentContext, simple_to_agent_input, stream_agent_response
 from chatkit.server import ChatKitServer
+from chatkit.store import AttachmentStore, Store
 from chatkit.types import ThreadMetadata, ThreadStreamEvent, UserMessageItem
 
 from .config import settings
-from .stores import InMemoryAttachmentStore, InMemoryStore
+from .tools import get_department_supplier_actuals
 
 
 class NexusChatServer(ChatKitServer[dict[str, Any]]):
@@ -17,8 +18,8 @@ class NexusChatServer(ChatKitServer[dict[str, Any]]):
 
     def __init__(
         self,
-        store: InMemoryStore,
-        attachment_store: InMemoryAttachmentStore,
+        store: Store[dict[str, Any]],
+        attachment_store: AttachmentStore[dict[str, Any]],
         *,
         instructions: str,
         history_limit: int,
@@ -29,6 +30,7 @@ class NexusChatServer(ChatKitServer[dict[str, Any]]):
             model=settings.model,
             name="Assistant",
             instructions=instructions,
+            tools=[get_department_supplier_actuals],
         )
 
     async def respond(

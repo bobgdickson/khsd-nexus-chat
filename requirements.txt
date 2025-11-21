@@ -7,3 +7,4 @@ pydantic-settings==2.12.0
 SQLAlchemy
 psycopg[binary]
 alembic
+pyodbc
