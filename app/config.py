@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     assistant_instructions: str = DEFAULT_INSTRUCTIONS
     history_limit: int = Field(default=20, ge=1, le=200)
     app_name: str = "KHSD Nexus Chat Backend"
-    public_base_url: str = "http://localhost:8002"
+    public_base_url: str = "http://localhost:8004"
     database_url: str | None = None
     domain_key: str = "domain_pk_localhost_dev"
     start_screen_greeting: str = "Ask me anything about your schools."

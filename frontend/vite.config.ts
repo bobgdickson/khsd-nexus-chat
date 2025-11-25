@@ -9,7 +9,8 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       open: true,
-      host: env.VITE_DEV_HOST ?? 'localhost'
+      host: env.VITE_DEV_HOST ?? 'localhost',
+      allowedHosts: ['.localhost', 'fs-chat.kernhigh.org'],
     }
   };
 });

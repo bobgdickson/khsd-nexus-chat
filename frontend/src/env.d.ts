@@ -4,6 +4,7 @@ interface ImportMetaEnv {
   readonly VITE_CHATKIT_CONFIG_URL?: string;
   readonly VITE_CHATKIT_AUTH_TOKEN?: string;
   readonly VITE_CHATKIT_USER_ID?: string;
+  readonly VITE_CHATKIT_API_URL?: string;
 }
 
 interface ImportMeta {

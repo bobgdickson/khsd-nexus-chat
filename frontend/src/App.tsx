@@ -23,7 +23,7 @@ const AUTH_TOKEN = import.meta.env.VITE_CHATKIT_AUTH_TOKEN;
 const USER_ID_HEADER = import.meta.env.VITE_CHATKIT_USER_ID ?? 'demo-user';
 const CONFIG_URL =
   import.meta.env.VITE_CHATKIT_API_URL ??
-  (import.meta.env.DEV ? 'http://localhost:8002/chatkit/config' : '/chatkit/config');
+  (import.meta.env.DEV ? 'http://localhost:8004/chatkit/config' : '/chatkit/config');
 const CHATKIT_SCRIPT_SRC = 'https://cdn.platform.openai.com/deployments/chatkit/chatkit.js';
 
 export default function App() {
