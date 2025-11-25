@@ -26,6 +26,7 @@ Backend service for the Nexus ChatKit frontend. This FastAPI app exposes the sin
    - `CHATKIT_DOMAIN_KEY` – domain key from the OpenAI dashboard.
    - `CHATKIT_GREETING` / `CHATKIT_PLACEHOLDER` – customize the start screen and composer text.
    - `CHATKIT_START_SCREEN_PROMPTS_JSON` – JSON array of `{ "label": "...", "prompt": "..." }` shown on the start screen.
+   - `LANGFUSE_SECRET_KEY`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_HOST` – enable Langfuse tracing via `app/instrumentation.py`.
    - `FIN_STR` – ODBC connection string for the PeopleSoft data warehouse used by the `get_department_supplier_actuals` tool.
 
 3. Start the server:
@@ -72,6 +73,16 @@ The `frontend` directory contains a Vite + React app with the ChatKit web compon
 - Without `DATABASE_URL`, storage falls back to in-memory (`InMemoryStore` and `InMemoryAttachmentStore`). Restarting the process clears all threads, items, and uploads. Set `DATABASE_URL` to keep everything in PostgreSQL.
 - The server uses the OpenAI Agents SDK via `openai-chatkit`. Update the default model or instructions in `app/config.py` if you want a different persona.
 - The ChatKit agent exposes a `get_department_supplier_actuals` tool that queries PeopleSoft using the SQL in `app/sql/dept_supplier_actuals.sql`. Set `FIN_STR` to a valid SQL Server ODBC connection string so the tool can run.
+
+## Langfuse tracing
+
+OpenAI Agents emits spans through the OpenInference instrumentation so Langfuse can capture end-to-end traces.
+
+1. Install + configure Langfuse credentials (`LANGFUSE_SECRET_KEY`, `LANGFUSE_PUBLIC_KEY`, and optionally `LANGFUSE_HOST`).
+2. The backend imports `app/instrumentation.py` on startup. It calls `OpenAIAgentsInstrumentor().instrument()` (from `openinference-instrumentation-openai-agents`) and boots the Langfuse client via `langfuse.get_client()`.
+3. When the required environment variables are missing, the instrumentation quietly skips itself.
+
+After the service boots you can inspect traces in Langfuse (LLM spans, tool calls, etc.) with no changes to the agent logic.
 - Set `DATABASE_URL` to enable the PostgreSQL store. Run `alembic upgrade head` after changing models.
 
 ## Database & migrations

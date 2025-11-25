@@ -28,7 +28,7 @@ class NexusChatServer(ChatKitServer[dict[str, Any]]):
         self.history_limit = history_limit
         self.assistant_agent = Agent[AgentContext](
             model=settings.model,
-            name="Assistant",
+            name="KHSD Spark Chatbot",
             instructions=instructions,
             tools=[get_department_supplier_actuals],
         )

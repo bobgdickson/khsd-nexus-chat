@@ -12,6 +12,7 @@ from chatkit.server import NonStreamingResult, StreamingResult
 from chatkit.store import NotFoundError
 
 from .config import settings
+from .instrumentation import configure_langfuse_tracing
 from .server import NexusChatServer
 from .stores import (
     InMemoryAttachmentStore,
@@ -20,7 +21,21 @@ from .stores import (
     PostgresStore,
 )
 
+def configure_logging() -> None:
+    """Ensure INFO-level app logs are emitted even under Uvicorn's defaults."""
+    root_logger = logging.getLogger()
+    if root_logger.handlers:
+        root_logger.setLevel(logging.INFO)
+    else:  # pragma: no cover - depends on runtime environment
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(levelname)-7s [%(name)s] %(message)s",
+        )
+
+configure_logging()
+
 load_dotenv()
+configure_langfuse_tracing()
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title=settings.app_name)

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   db:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     restart: unless-stopped
     environment:
       POSTGRES_DB: chatkit
@@ -23,6 +23,9 @@ services:
       DATABASE_URL: postgresql+psycopg://chatkit:chatkit@db:5432/chatkit
       CHATKIT_PUBLIC_BASE_URL: http://localhost:8000
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-}
     ports:
       - "8000:8000"
 

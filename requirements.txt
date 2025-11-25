@@ -8,3 +8,5 @@ SQLAlchemy
 psycopg[binary]
 alembic
 pyodbc
+langfuse==3.10.1
+openinference-instrumentation-openai-agents==1.3.1
