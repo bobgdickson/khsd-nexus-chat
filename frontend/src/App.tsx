@@ -121,15 +121,24 @@ export default function App() {
 function ChatKitSurface({ config }: { config: ChatKitUiConfig }) {
   useEffect(() => {
     if (customElements.get('openai-chatkit')) {
+      console.log('[chatkit] custom element already registered, skipping script injection');
       return;
     }
     const script = document.createElement('script');
     script.src = CHATKIT_SCRIPT_SRC;
     script.async = true;
     script.dataset.chatkitRuntime = 'true';
+    console.log('[chatkit] injecting script', CHATKIT_SCRIPT_SRC);
+    script.addEventListener('load', () => {
+      console.log('[chatkit] script loaded', CHATKIT_SCRIPT_SRC);
+    });
+    script.addEventListener('error', (event) => {
+      console.error('[chatkit] failed to load script', CHATKIT_SCRIPT_SRC, event);
+    });
     document.head.appendChild(script);
     return () => {
       if (!customElements.get('openai-chatkit') && script.parentElement) {
+        console.log('[chatkit] removing script before custom element registered');
         script.parentElement.removeChild(script);
       }
     };

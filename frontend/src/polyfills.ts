@@ -2,6 +2,7 @@
 
 // Only run in browser
 if (typeof window !== 'undefined') {
+  console.log('[polyfills] polyfills.ts executing');
   const win = window as any;
 
   if (!win.crypto) {
@@ -54,5 +55,11 @@ if (typeof window !== 'undefined') {
         hex[bytes[15]]
       );
     };
+
+    console.log('[polyfills] randomUUID polyfill installed');
+  } else {
+    console.log('[polyfills] native randomUUID available');
   }
+
+  console.log('[polyfills] polyfills.ts completed');
 }
