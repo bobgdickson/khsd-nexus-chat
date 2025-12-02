@@ -1,3 +1,3 @@
-from .dept_supplier_actuals import get_department_supplier_actuals
+from .peoplesoft.tool import query_ps_finance
 
-__all__ = ["get_department_supplier_actuals"]
+__all__ = ["query_ps_finance"]

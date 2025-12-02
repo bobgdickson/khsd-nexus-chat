@@ -10,7 +10,7 @@ from chatkit.store import AttachmentStore, Store
 from chatkit.types import ThreadMetadata, ThreadStreamEvent, UserMessageItem
 
 from .config import settings
-from .tools import get_department_supplier_actuals
+from .tools import query_ps_finance
 
 
 class NexusChatServer(ChatKitServer[dict[str, Any]]):
@@ -30,7 +30,7 @@ class NexusChatServer(ChatKitServer[dict[str, Any]]):
             model=settings.model,
             name="KHSD Spark Chatbot",
             instructions=instructions,
-            tools=[get_department_supplier_actuals],
+            tools=[query_ps_finance],
         )
 
     async def respond(
