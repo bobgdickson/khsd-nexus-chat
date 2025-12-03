@@ -15,6 +15,8 @@ GL_SUMMARY = {
         "class": "CLASS_FLD",
         "project": "PROJECT_ID",
         "amount": "POSTED_TOTAL_AMT",
+        # Aggregates use SQL expressions; {alias} will be replaced with the entity alias.
+        "amount_sum": {"expression": "SUM({alias}.POSTED_TOTAL_AMT)"},
 
         # Fake DW fields for later; for now you can either:
         # - leave them unmapped (and disallow their use), or
