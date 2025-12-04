@@ -30,49 +30,84 @@ def build_sql(
     cfg = ENTITIES[entity]
     table = cfg["table"]
     alias = cfg.get("alias", "t")
-    field_map: Dict[str, Union[str, Dict[str, Any], None]] = cfg["field_map"]
+    field_map: Dict[str, Union[str, Dict[str, Any]]] = cfg["field_map"]
+    joins_cfg: List[Dict[str, Any]] = cfg.get("joins", [])
+
+    # Map logical join fields (descrs) to their full expressions (e.g. "acct.DESCR")
+    join_field_map: Dict[str, str] = {}
+    for j in joins_cfg:
+        for logical, expr in j.get("fields", {}).items():
+            join_field_map[logical] = expr
 
     def _get_mapping(field: str) -> Union[str, Dict[str, Any]]:
-        mapping = field_map.get(field)
-        if not mapping:
-            raise ValueError(f"Field '{field}' is not available for entity '{entity}'")
-        return mapping
+        if field in field_map:
+            return field_map[field]
+        if field in join_field_map:
+            return {"join_expression": join_field_map[field]}
+        raise ValueError(f"Field '{field}' is not available for entity '{entity}'")
 
     def _select_expression(field: str) -> str:
         mapping = _get_mapping(field)
+
         if isinstance(mapping, str):
             return f"{alias}.{mapping} AS {field}"
+
+        # Expression on base table (e.g., amount_sum)
         expression = mapping.get("expression")
         if expression:
             expr_sql = expression.format(alias=alias)
             return f"{expr_sql} AS {field}"
+
+        # Join-based field
+        join_expr = mapping.get("join_expression")
+        if join_expr:
+            return f"{join_expr} AS {field}"
+
+        # Column on base table
         column = mapping.get("column")
         if column:
             return f"{alias}.{column} AS {field}"
+
         raise ValueError(f"Field '{field}' is not selectable for entity '{entity}'")
 
     def _column_reference(field: str, purpose: str) -> str:
         mapping = _get_mapping(field)
+
         if isinstance(mapping, str):
             return f"{alias}.{mapping}"
+
+        expression = mapping.get("expression")
+        if expression:
+            return expression.format(alias=alias)
+
+        join_expr = mapping.get("join_expression")
+        if join_expr:
+            return join_expr
+
         column = mapping.get("column")
         if column:
             return f"{alias}.{column}"
+
         raise ValueError(f"Field '{field}' cannot be used in {purpose} for entity '{entity}'")
 
     eff_limit = min(limit or 1000, MAX_LIMIT)
 
-    # Map logical select fields to physical columns
-    columns: List[str] = []
-    for f in select:
-        columns.append(_select_expression(f))
-
-    if not columns:
+    # SELECT clause
+    if not select:
         raise ValueError("No select columns specified")
+    columns = [_select_expression(f) for f in select]
 
-    # For SQL Server, apply TOP at the select level for limit.
     top_clause = f"TOP {eff_limit} " if eff_limit is not None else ""
     sql = f"SELECT {top_clause}{', '.join(columns)} FROM {table} {alias}"
+
+    # Always add all joins defined for the entity
+    for j in joins_cfg:
+        join_type = j.get("type", "LEFT").upper()
+        join_table = j["table"]
+        join_alias = j["alias"]
+        on_conditions = j.get("on", [])
+        on_sql = " AND ".join(on_conditions)
+        sql += f" {join_type} JOIN {join_table} {join_alias} ON {on_sql}"
 
     where_clauses: List[str] = []
     params: List[Any] = []
@@ -128,14 +163,7 @@ def build_sql(
         for ob in order_by:
             field = ob["field"]
             direction = ob.get("direction", "asc").lower()
-            try:
-                col = _column_reference(field, "order by")
-            except ValueError:
-                mapping = field_map.get(field)
-                if isinstance(mapping, dict) and mapping.get("expression"):
-                    col = field  # fall back to alias for computed fields
-                else:
-                    raise
+            col = _column_reference(field, "order by")
             dir_sql = "DESC" if direction == "desc" else "ASC"
             order_clauses.append(f"{col} {dir_sql}")
         if order_clauses:
@@ -144,16 +172,15 @@ def build_sql(
     return sql, params
 
 if __name__ == "__main__":
-    # Simple test
     test_entity = "gl_summary"
-    test_select = ["fiscal_year", "department", "amount_sum"]
+    test_select = ["fiscal_year", "department", "dept_descr", "amount_sum"]
     test_filters = [
         {"field": "fiscal_year", "op": "=", "value": 2024},
         {"field": "department", "op": "=", "value": "5500"},
     ]
     test_limit = 10
     test_order_by = [{"field": "amount_sum", "direction": "desc"}]
-    test_group_by = ["fiscal_year", "department"]
+    test_group_by = ["fiscal_year", "department", "dept_descr"]
 
     sql, params = build_sql(
         test_entity,
