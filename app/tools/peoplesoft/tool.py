@@ -46,6 +46,16 @@ def query_ps_finance(
     - "class"
     - "project"
     - "amount"             (posted balance for that combination)
+    - "amount_sum"         (SUM of posted amounts when using group_by)
+
+    Description helper fields (auto-joined lookups):
+    - "account_descr"      (GL account description)
+    - "dept_descr"         (department description)
+    - "fund_descr"         (fund description)
+    - "resource_descr"     (program/resource description)
+    - "site_descr"         (operating unit/site description)
+    - "class_descr"        (class field description)
+    - "project_descr"      (project description)
 
     Usage guidelines:
     - Use "gl_summary" when the user asks about balances, totals, or summary by year/period, account, dept, fund, program, etc.
@@ -54,6 +64,7 @@ def query_ps_finance(
     - If the user asks for “by account and department”, include "object", "department" in select.
     - Keep select fields minimal but sufficient to answer the question.
     - Provide group_by fields when requesting aggregations (e.g., totals by department).
+    - Include the *_descr helper fields in select when the user wants human-friendly descriptions.
     - Use reasonable limits (e.g. <= 5000 rows). Let the backend enforce a hard max.
 
     Examples:
@@ -62,7 +73,7 @@ def query_ps_finance(
 
     Call query_ps_finance with:
     - entity: "gl_summary"
-    - select: ["business_unit", "fiscal_year", "period", "account", "department", "amount"]
+    - select: ["business_unit", "fiscal_year", "period", "account", "account_descr", "department", "dept_descr", "amount"]
     - filters:
     - fiscal_year = 2024
     - business_unit = "KERNH"

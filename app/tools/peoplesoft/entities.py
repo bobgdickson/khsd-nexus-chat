@@ -88,7 +88,7 @@ GL_SUMMARY = {
                 "AND A_ED.EFFDT <= CAST(GETDATE() AS DATE))",
             ],
             "fields": {
-                "program_descr": "prg.DESCR",
+                "resource_descr": "prg.DESCR",
             },
         },
         {
@@ -106,7 +106,7 @@ GL_SUMMARY = {
                 "AND A_ED.EFFDT <= CAST(GETDATE() AS DATE))",
             ],
             "fields": {
-                "operating_unit_descr": "ou.DESCR",
+                "site_descr": "ou.DESCR",
             },
         },
         {
