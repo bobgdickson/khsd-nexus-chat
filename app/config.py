@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     """Application configuration loaded from environment variables."""
 
     openai_api_key: str | None = None
-    model: str = "gpt-5"
+    model: str = "gpt-5.1"
     assistant_instructions: str = DEFAULT_INSTRUCTIONS
     history_limit: int = Field(default=20, ge=1, le=200)
     app_name: str = "KHSD Nexus Chat Backend"
